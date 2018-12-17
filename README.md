@@ -17,3 +17,7 @@ To enable RDFSBASE instruction and its friends, run the following command
 To disable RDFSBASE instruction and its friends, run the following command
 
     make uninstall
+
+# Linux kernel versions
+
+This code has been tested with Linux kernel 4.15. It may or may not work with newer or older versions of Linux kernel.
