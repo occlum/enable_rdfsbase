@@ -1,8 +1,11 @@
 obj-m += enable_rdfsbase.o
 
-all:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+KERNEL_MAKE := $(MAKE) -C /lib/modules/$(shell uname -r)/build SUBDIRS=$(PWD) 
 
+all:
+	$(KERNEL_MAKE) modules
+
+# Use install and uninstall targets for debug and developement purpose
 install:
 	sudo insmod enable_rdfsbase.ko
 
@@ -10,5 +13,5 @@ uninstall:
 	sudo rmmod enable_rdfsbase.ko
 
 clean:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	$(KERNEL_MAKE) clean
 	$(RM) *.o.ur-safe

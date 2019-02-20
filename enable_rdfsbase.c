@@ -1,9 +1,14 @@
+/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
 /*
- *  Linux kernel module.
+ * A kernel module to enable RDFSBASE family instructions on x86.
+ *
+ * Copyright (c) 2018-2019 Intel Corp. All rights reserved.
+ * Author: Hongliang Tian <tatetian@gmail.com>
  */
+
 #include <linux/compiler.h>
-#include <linux/module.h>	/* Needed by all modules */
-#include <linux/kernel.h>	/* Needed for KERN_INFO */
+#include <linux/module.h>
+#include <linux/kernel.h>
 #include <asm/tlbflush.h>
 #include <asm/smp.h>
 
@@ -65,3 +70,7 @@ void cleanup_module(void)
 
     LOG("Unloaded\n");
 }
+
+MODULE_LICENSE("Dual BSD/GPL");
+MODULE_AUTHOR("Hongliang Tian, Intel Corp.");
+MODULE_DESCRIPTION("Enable RDFSBASE family instructions on x86");

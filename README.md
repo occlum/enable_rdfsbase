@@ -8,16 +8,24 @@ To compile the kernel module, run the following command
 
     make
 
-# How to Use
-
-To enable RDFSBASE instruction and its friends, run the following command
+To enable RDFSBASE instruction and its friends until the next OS reboot, run the following command
 
     make install
 
-To disable RDFSBASE instruction and its friends, run the following command
+To disable RDFSBASE instruction and its friends until the next OS reboot, run the following command
 
     make uninstall
 
-# Linux kernel versions
+# How to Install
+
+To enable RDFSBASE permanently (i.e., enabled even after the next OS reboot), run
+
+    ./install.sh
+
+To uninstall, run
+
+    ./uninstall.sh
+
+# Kernel Compatibility
 
 This code has been tested with Linux kernel 4.15. It may or may not work with newer or older versions of Linux kernel.
