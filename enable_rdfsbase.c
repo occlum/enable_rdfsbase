@@ -16,80 +16,78 @@
 
 #define LOG(...)            printk(KERN_INFO "enable_rdfsbase: " __VA_ARGS__)
 
-#define CR4_FSGSBASE_BIT    16
+#define CR4_FSGSBASE_BIT    (16)
 #define CR4_FSGSBASE_MASK   (1UL << CR4_FSGSBASE_BIT)
 
 
-static void set_cr4_fsgsbase(void* _unused)
+static void set_cr4_fsgsbase(void *_unused)
 {
 #if KERNEL_VERSION(4, 0, 0) <= LINUX_VERSION_CODE
-    cr4_set_bits(CR4_FSGSBASE_MASK);
+	cr4_set_bits(CR4_FSGSBASE_MASK);
 #else
-    unsigned long cr4_val;
+	unsigned long cr4_val;
 
-    cr4_val = read_cr4();
-    if ((cr4_val | CR4_FSGSBASE_MASK) != cr4_val) {
-        cr4_val |= CR4_FSGSBASE_MASK;
-        write_cr4(cr4_val);
-    }
+	cr4_val = read_cr4();
+	if ((cr4_val | CR4_FSGSBASE_MASK) != cr4_val) {
+		cr4_val |= CR4_FSGSBASE_MASK;
+		write_cr4(cr4_val);
+	}
 #endif
 }
 
-static void clear_cr4_fsgsbase(void* _unused)
+static void clear_cr4_fsgsbase(void *_unused)
 {
 #if KERNEL_VERSION(4, 0, 0) <= LINUX_VERSION_CODE
-    cr4_set_bits(CR4_FSGSBASE_MASK);
+	cr4_set_bits(CR4_FSGSBASE_MASK);
 #else
-    unsigned long cr4_val;
+	unsigned long cr4_val;
 
-    cr4_val = read_cr4();
-    if ((cr4_val & ~CR4_FSGSBASE_MASK) != cr4_val) {
-        cr4_val &= ~CR4_FSGSBASE_MASK;
-        write_cr4(cr4_val);
-    }
+	cr4_val = read_cr4();
+	if ((cr4_val & ~CR4_FSGSBASE_MASK) != cr4_val) {
+		cr4_val &= ~CR4_FSGSBASE_MASK;
+		write_cr4(cr4_val);
+	}
 #endif
 }
 
-
-int init_module(void)
+int __init enable_rdfsbase_init(void)
 {
-    int cpu;
-    int err;
+	int cpu;
+	int err;
 
-    LOG("Loaded\n");
+	LOG("Loaded\n");
 
-    for_each_online_cpu(cpu) {
-        err = smp_call_function_single(cpu, set_cr4_fsgsbase, NULL, 1);
+	for_each_online_cpu(cpu) {
+		err = smp_call_function_single(cpu, set_cr4_fsgsbase, NULL, 1);
 
-        if (err) {
-            LOG("Fail to set CR4.FSGSBASE on CPU %d\n", cpu);
-        }
-        else {
-            LOG("RDFSBASE and its friends are now enabled on CPU %d\n", cpu);
-        }
-    }
+		if (err)
+			LOG("Fail to set CR4.FSGSBASE on CPU %d\n", cpu);
+		else
+			LOG("RDFSBASE and its friends are now enabled on CPU %d\n", cpu);
+	}
 
-    return 0;
+	return 0;
 }
 
-void cleanup_module(void)
+void __exit enable_rdfsbase_exit(void)
 {
-    int cpu;
-    int err;
+	int cpu;
+	int err;
 
-    for_each_online_cpu(cpu) {
-        err = smp_call_function_single(cpu, clear_cr4_fsgsbase, NULL, 1);
+	for_each_online_cpu(cpu) {
+		err = smp_call_function_single(cpu, clear_cr4_fsgsbase, NULL, 1);
 
-        if (err) {
-            LOG("Fail to clear CR4.FSGSBASE on CPU %d\n", cpu);
-        }
-        else {
-            LOG("RDFSBASE and its friends are now disabled on CPU %d\n", cpu);
-        }
-    }
+		if (err)
+			LOG("Fail to clear CR4.FSGSBASE on CPU %d\n", cpu);
+		else
+			LOG("RDFSBASE and its friends are now disabled on CPU %d\n", cpu);
+	}
 
-    LOG("Unloaded\n");
+	LOG("Unloaded\n");
 }
+
+module_init(enable_rdfsbase_init);
+module_exit(enable_rdfsbase_exit);
 
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_AUTHOR("Hongliang Tian, Intel Corp.");
