@@ -7,8 +7,10 @@
  */
 
 #include <linux/compiler.h>
-#include <linux/module.h>
+#include <linux/init.h>
 #include <linux/kernel.h>
+#include <linux/module.h>
+#include <linux/version.h>
 #include <asm/tlbflush.h>
 #include <asm/smp.h>
 
@@ -18,16 +20,34 @@
 #define CR4_FSGSBASE_MASK   (1UL << CR4_FSGSBASE_BIT)
 
 
-static void set_cr4_fsgsbase(void* _unused) {
-    unsigned long cr4_val = cr4_read_shadow();
-    int is_rdfsbase_enabled = (cr4_val & CR4_FSGSBASE_MASK) != 0;
-    if (is_rdfsbase_enabled) return;
-
+static void set_cr4_fsgsbase(void* _unused)
+{
+#if KERNEL_VERSION(4, 0, 0) <= LINUX_VERSION_CODE
     cr4_set_bits(CR4_FSGSBASE_MASK);
+#else
+    unsigned long cr4_val;
+
+    cr4_val = read_cr4();
+    if ((cr4_val | CR4_FSGSBASE_MASK) != cr4_val) {
+        cr4_val |= CR4_FSGSBASE_MASK;
+        write_cr4(cr4_val);
+    }
+#endif
 }
 
-static void clear_cr4_fsgsbase(void* _unused) {
-    cr4_clear_bits(CR4_FSGSBASE_MASK);
+static void clear_cr4_fsgsbase(void* _unused)
+{
+#if KERNEL_VERSION(4, 0, 0) <= LINUX_VERSION_CODE
+    cr4_set_bits(CR4_FSGSBASE_MASK);
+#else
+    unsigned long cr4_val;
+
+    cr4_val = read_cr4();
+    if ((cr4_val & ~CR4_FSGSBASE_MASK) != cr4_val) {
+        cr4_val &= ~CR4_FSGSBASE_MASK;
+        write_cr4(cr4_val);
+    }
+#endif
 }
 
 
