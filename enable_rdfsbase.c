@@ -57,6 +57,11 @@ int __init enable_rdfsbase_init(void)
 
 	LOG("Loaded\n");
 
+	if (!boot_cpu_has(X86_FEATURE_FSGSBASE)) {
+		LOG("FSGSBASE feature is not supported by this CPU!\n");
+		return -ENODEV;
+	}
+
 	for_each_online_cpu(cpu) {
 		err = smp_call_function_single(cpu, set_cr4_fsgsbase, NULL, 1);
 
