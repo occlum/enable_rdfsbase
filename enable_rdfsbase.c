@@ -38,7 +38,7 @@ static void set_cr4_fsgsbase(void *_unused)
 static void clear_cr4_fsgsbase(void *_unused)
 {
 #if KERNEL_VERSION(4, 0, 0) <= LINUX_VERSION_CODE
-	cr4_set_bits(CR4_FSGSBASE_MASK);
+	cr4_clear_bits(CR4_FSGSBASE_MASK);
 #else
 	unsigned long cr4_val;
 
