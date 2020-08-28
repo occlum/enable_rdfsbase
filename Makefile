@@ -1,6 +1,6 @@
 obj-m += enable_rdfsbase.o
 
-KERNEL_MAKE := $(MAKE) -C /lib/modules/$(shell uname -r)/build SUBDIRS=$(PWD) 
+KERNEL_MAKE := $(MAKE) -C /lib/modules/$(shell uname -r)/build M=$(shell pwd)
 
 all:
 	$(KERNEL_MAKE) modules
